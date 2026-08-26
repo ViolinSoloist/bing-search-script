@@ -44,4 +44,5 @@ if __name__ == "__main__":
     Script.openApp("Microsoft Edge", 1.0)
 
 
-    
+class FastScript(Script):
+    pass

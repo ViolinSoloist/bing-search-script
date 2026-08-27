@@ -1,18 +1,29 @@
 import pyautogui as auto
 import time as tm
 import random
-from wonderwords import RandomWord  # pyright: ignore[reportMissingImports]
+from wonderwords import RandomWord                  # pyright: ignore[reportMissingImports]
 from abc import ABC, abstractmethod
 
+from selenium import webdriver                      # pyright: ignore[reportMissingImports]
+from selenium.webdriver.common.by import By         # pyright: ignore[reportMissingImports]
+from selenium.webdriver.edge.service import Service # pyright: ignore[reportMissingImports]
+from selenium.webdriver.edge.options import Options # pyright: ignore[reportMissingImports]
+
 from script_utils import Script
+from scrapper import RewardsScraper
 
 class Search(ABC):
+    """Classe abstrata de pesquisa, antes de se especificar qual navegador será usado.
+    
+    :param limit: Limite de pontos possíveis de se ganhar por dia pesquisando. Geralmente é 60.
+    :type limit: int (opcional)"""
     def __init__(self, limit:int = 60):
         self.mp = limit
         self.pps = 3 # points per search
 
     @abstractmethod
     def searchSetup(self):
+        """Faz as preparações necessárias para iniciar a pesquisa. Depende de qual navegador está sendo usado."""
         pass
 
     def __writeRandSentence(self):
@@ -39,9 +50,20 @@ class Search(ABC):
         auto.keyUp('home')
         auto.keyUp('shift')
 
+    def scrapCurrentPts(self) -> int:
+        scrp = RewardsScraper()
+        return scrp.getCurrentPts()
 
-    def start(self, current_pts:int):
-        if current_pts < 0 or current_pts % self.pps != 0:
+    def start(self, current_pts:int = None):
+        """Realiza as pesquisas até alcançar o limite de pontos.
+        
+        :param current_pts: Quantidade de pontos atuais. Se não especificado, usa Web Scrapping para obter automaticamente.
+        :type current_pts: int (opcional)"""
+
+        if current_pts is None:
+            current_pts = self.scrapCurrentPts()
+
+        if current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")
 
         if current_pts < self.mp:
@@ -61,5 +83,3 @@ class EdgeSearch(Search):
     def searchSetup(self):
         Script.openApp("Microsoft Edge", 0.3)
         auto.hotkey("win" + "up")
-
-

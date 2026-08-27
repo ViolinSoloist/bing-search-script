@@ -1,4 +1,4 @@
 from bing_bot import EdgeSearch
 
-s = EdgeSearch()
-s.start(0)
+scrp = EdgeSearch().scrapCurrentPts()
+print(scrp)

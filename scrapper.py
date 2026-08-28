@@ -74,7 +74,8 @@ class RewardsScraper:
                 # novo navegador visível para login
                 opcoes_visivel = Options()
                 opcoes_visivel.add_argument(self.caminho_bot)
-                
+
+                print("Abrindo guia visível de login...")
                 driver = webdriver.Edge(options=opcoes_visivel)
                 driver.get("https://rewards.bing.com/earn")
                 

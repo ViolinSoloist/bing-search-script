@@ -21,10 +21,6 @@ class Search(ABC):
         self.mp = limit
         self.pps = 3 # points per search
 
-    @abstractmethod
-    def searchSetup(self):
-        """Faz as preparações necessárias para iniciar a pesquisa. Depende de qual navegador está sendo usado."""
-        pass
 
     def __writeRandSentence(self):
         search_str = RandomWord().word()
@@ -50,18 +46,48 @@ class Search(ABC):
         auto.keyUp('home')
         auto.keyUp('shift')
 
-    def scrapCurrentPts(self) -> int:
-        scrp = RewardsScraper()
-        return scrp.getCurrentPts()
+    @abstractmethod
+    def searchSetup(self):
+        """Faz as preparações necessárias para iniciar a pesquisa. Depende de qual navegador está sendo usado."""
+        pass
 
+    @abstractmethod
     def start(self, current_pts:int = None):
-        """Realiza as pesquisas até alcançar o limite de pontos.
+        """Realiza as pesquisas até alcançar o limite de pontos. Se for no Microsoft Edge, o parâmetro é opcional
+        (deixá-lo em branco faz o programa realizar Web Scrapping para obter os pontos atuais).
         
-        :param current_pts: Quantidade de pontos atuais. Se não especificado, usa Web Scrapping para obter automaticamente.
-        :type current_pts: int (opcional)"""
+        :param current_pts: Quantidade de pontos atuais.
+        :type current_pts: int"""
+        pass
 
+class EdgeSearch(Search):
+    """Necessário usar Windows. Instancia o script para rodar especificamente no navegador Microsoft Store, que é o mais próprio
+    para os fins deste script.
+
+    :param limit: Limite de pontos possíveis de se ganhar por dia pesquisando. Geralmente é 60.
+    :type limit: int (opcional)"""
+    def __init__(self, limit:int = 60):
+        super().__init__(limit)
+
+    # Override
+    def searchSetup(self):
+        Script.openApp("Microsoft Edge", 0.3)
+        auto.hotkey("win" + "up")
+
+    def scrapCurrentPts(self) -> int:
+            """Faz Web Scrapping para obter a quantidade de pontos atuais. Necessário fazer login se for a primeira vez executando esse script."""
+            scrp = RewardsScraper()
+            return scrp.getCurrentPts()
+
+    # Override
+    def start(self, current_pts = None):
+        """Se não especificado, usa Web Scrapping para obter automaticamente."""
         if current_pts is None:
-            current_pts = self.scrapCurrentPts()
+            try:
+                current_pts = self.scrapCurrentPts()
+            except Exception as erro:
+                print(f"Erro: {erro}. Não foi possível determinar valor inicial: valor considerado será 0. ")
+                current_pts = 0
 
         if current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")
@@ -69,17 +95,9 @@ class Search(ABC):
         if current_pts < self.mp:
             self.searchSetup()
 
-        while current_pts < self.mp:
+        while current_pts < self.mp + self.pps: #margem de erro: 1 pesquisa extra
             self.__searchLoop()
             current_pts += self.pps
 
         print(f"Quantidade limite de pontos alcançada: {self.mp} pontos.")
         return
-
-class EdgeSearch(Search):
-    def __init__(self, limit:int = 60):
-        super().__init__(limit)
-
-    def searchSetup(self):
-        Script.openApp("Microsoft Edge", 0.3)
-        auto.hotkey("win" + "up")

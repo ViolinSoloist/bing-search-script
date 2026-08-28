@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC    # pyright: i
 from selenium.common.exceptions import TimeoutException             # pyright: ignore[reportMissingImports]
 import time as tm
 import os
+import shutil
 from exceptions import ScrapError
 
 class RewardsScraper:
@@ -16,6 +17,7 @@ class RewardsScraper:
         caminho_base = os.getenv('LOCALAPPDATA')
         caminho_final = os.path.join(caminho_base, "Microsoft", "Edge", "Bot Data")
         self.caminho_bot = f"user-data-dir={caminho_final}"
+        self.win_path = f"{caminho_final}"
         # Guarda-se apenas o caminho do perfil. Outras configurações serão definidas go-to
 
     def __extrair_pontos(self, driver) -> int:
@@ -103,3 +105,16 @@ class RewardsScraper:
                     driver.quit()
                 except:
                     pass
+    
+    def deleteProfileDir(self):
+        """Deleta todo conteúdo da pasta do usuário usado no Web Scrapping e a pasta em si.
+        Útil para redefinir qual conta microsoft se deseja saber a quantidade de pontos diários de pesquisa atual (Necessário refazer login)."""
+
+        if os.path.exists(self.win_path):
+            try:
+                shutil.rmtree(self.win_path)
+                print("Perfil apagado.")
+            except Exception as erro:
+                print(f"Falha ao tentar apagar o perfil: {erro}")
+        else:
+            print("Diretório do perfil inexistente.")

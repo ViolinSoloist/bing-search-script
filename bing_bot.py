@@ -79,14 +79,21 @@ class EdgeSearch(Search):
         scrp = RewardsScraper()
         return scrp.getCurrentPts()
 
+    def resetProfile(self):
+        """Reseta (deleta) o perfil usado no Web Scrapping, apagando o diretório com as informações de usuário.
+        Não interefere com o perfil usual de navegação do usuário."""
+        profile = RewardsScraper()
+        profile.deleteProfileDir()
+
     # Override
     def start(self, current_pts = None):
-        """Se não especificado, usa Web Scrapping para obter automaticamente."""
+        """Realiza as pesquisas usando Microsoft Edge até alcançar o limite de pontos. Se não especificado, usa Web Scrapping para obter automaticamente.
+        Deve estar logado na conta microsoft em que se deseja ganhar pontos."""
         if current_pts is None:
             try:
                 current_pts = self.scrapCurrentPts()
             except Exception as erro:
-                print(f"Erro: {erro}. Não foi possível determinar valor inicial: valor considerado será 0. ")
+                print(f"Erro: {erro}. Não foi possível determinar valor inicial: valor considerado será 0. ")  
 
         if current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")

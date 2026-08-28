@@ -75,9 +75,9 @@ class EdgeSearch(Search):
         auto.hotkey("win" + "up")
 
     def scrapCurrentPts(self) -> int:
-            """Faz Web Scrapping para obter a quantidade de pontos atuais. Necessário fazer login se for a primeira vez executando esse script."""
-            scrp = RewardsScraper()
-            return scrp.getCurrentPts()
+        """Faz Web Scrapping para obter a quantidade de pontos atuais. Necessário fazer login se for a primeira vez executando esse script."""
+        scrp = RewardsScraper()
+        return scrp.getCurrentPts()
 
     # Override
     def start(self, current_pts = None):
@@ -87,7 +87,6 @@ class EdgeSearch(Search):
                 current_pts = self.scrapCurrentPts()
             except Exception as erro:
                 print(f"Erro: {erro}. Não foi possível determinar valor inicial: valor considerado será 0. ")
-                current_pts = 0
 
         if current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")

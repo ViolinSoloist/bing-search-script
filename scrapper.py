@@ -5,14 +5,18 @@ from selenium.webdriver.support.ui import WebDriverWait             # pyright: i
 from selenium.webdriver.support import expected_conditions as EC    # pyright: ignore[reportMissingImports]
 from selenium.common.exceptions import TimeoutException             # pyright: ignore[reportMissingImports]
 import time as tm
+import os
+from exceptions import ScrapError
 
 class RewardsScraper:
     """
     Realiza Web Scrapping dinâmico para obter dados relativos ao Rewards.
     """
     def __init__(self):
+        caminho_base = os.getenv('LOCALAPPDATA')
+        caminho_final = os.path.join(caminho_base, "Microsoft", "Edge", "Bot Data")
+        self.caminho_bot = f"user-data-dir={caminho_final}"
         # Guarda-se apenas o caminho do perfil. Outras configurações serão definidas go-to
-        self.caminho_bot = r"user-data-dir=C:\Users\rodri\AppData\Local\Microsoft\Edge\Bot Data"
 
     def __extrair_pontos(self, driver) -> int:
         """
@@ -34,8 +38,7 @@ class RewardsScraper:
                 if pontos > 0:
                     return pontos
                     
-        print("Nenhum número válido encontrado na aba lateral.")
-        return 0
+        raise ScrapError("Não foi encontrado valor válido para pontos atuais.")
 
     def getCurrentPts(self) -> int:
         """

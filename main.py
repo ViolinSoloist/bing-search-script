@@ -1,6 +1,6 @@
 from bing_bot import EdgeSearch
 
 try:
-    EdgeSearch().start(-1)
+    EdgeSearch().start()
 except Exception as erro:
     print(erro)

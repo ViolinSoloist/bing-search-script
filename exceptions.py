@@ -18,3 +18,6 @@ class ImgNotCopiedError(Exception):
 
 class WinFocusError(Exception):
     """Falha em focar/mudar para algum app/janela."""
+
+class ScrapError(Exception):
+    """Quando não se obtém o valor esperado ao fazer Web Scrapping."""

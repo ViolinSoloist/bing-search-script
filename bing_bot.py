@@ -18,8 +18,8 @@ class Search(ABC):
     :param limit: Limite de pontos possíveis de se ganhar por dia pesquisando. Geralmente é 60.
     :type limit: int (opcional)"""
     def __init__(self, limit:int = 60):
-        self.mp = limit
-        self.pps = 3 # points per search
+        self._mp = limit
+        self._pps = 3 # points per search
 
 
     def __writeRandSentence(self):
@@ -27,12 +27,12 @@ class Search(ABC):
         auto.write(search_str)
 
     def __cooldown(self):
-        tm.sleep(random.uniform(3, 4))
+        tm.sleep(random.uniform(3.5, 4.5))
         auto.moveTo(1080/2 + random.randint(-160, 160), 1920/2 + random.randint(-80,80))
         auto.scroll(random.randint(-500, -200))
-        tm.sleep(random.uniform(3, 4))
+        tm.sleep(random.uniform(3.5, 4.5))
 
-    def __searchLoop(self):
+    def _searchLoop(self):
         self.__writeRandSentence()
         auto.press("enter")
         self.__cooldown()
@@ -47,7 +47,7 @@ class Search(ABC):
         auto.keyUp('shift')
 
     @abstractmethod
-    def searchSetup(self):
+    def _searchSetup(self):
         """Faz as preparações necessárias para iniciar a pesquisa. Depende de qual navegador está sendo usado."""
         pass
 
@@ -70,7 +70,7 @@ class EdgeSearch(Search):
         super().__init__(limit)
 
     # Override
-    def searchSetup(self):
+    def _searchSetup(self):
         Script.openApp("Microsoft Edge", 0.3)
         auto.hotkey("win" + "up")
 
@@ -98,12 +98,13 @@ class EdgeSearch(Search):
         if current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")
 
-        if current_pts < self.mp:
-            self.searchSetup()
+        if current_pts < self._mp:
+            self._searchSetup()
 
-        while current_pts < self.mp + self.pps: #margem de erro: 1 pesquisa extra
-            self.__searchLoop()
-            current_pts += self.pps
+        while current_pts < self._mp + self._pps: #margem de erro: 1 pesquisa extra
+            self._searchLoop()
+            current_pts += self._pps
 
-        print(f"Quantidade limite de pontos alcançada: {self.mp} pontos.")
+        auto.hotkey("alt", "f4")
+        print(f"Quantidade limite de pontos alcançada: {self._mp} pontos.")
         return

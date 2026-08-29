@@ -2,6 +2,19 @@ import pyautogui as auto
 import time
 from exceptions import ImgNotCopiedError, WinFocusError
 
+class PowerConfig:
+    """Configurações de suspensão, desligamento automático, etc"""
+    def __openPowerOptions(self):
+        auto.press('win')
+        auto.press('tab')
+        auto.press('down', presses=5)
+        auto.press('enter')
+
+    def powerOff(self):
+        self.__openPowerOptions()
+        auto.press('down', presses=2)
+        auto.press('enter')
+
 class Script:
     """Classe que implementa as funções mais gerais e úteis para projetos de automação usando pyautogui."""
 

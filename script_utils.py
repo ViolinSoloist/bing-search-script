@@ -1,17 +1,16 @@
 import pyautogui as auto
 import time
-from exceptions import ImgNotCopiedError, WinFocusError
+from exceptions import WinFocusError
 
 class PowerConfig:
     """Configurações de suspensão, desligamento automático, etc"""
-    def __openPowerOptions(self):
-        auto.press('win')
-        auto.press('tab')
-        auto.press('down', presses=5)
-        auto.press('enter')
+    def __openSysToolsMenu(self):
+        auto.hotkey('win', 'x')
 
     def powerOff(self):
-        self.__openPowerOptions()
+        self.__openSysToolsMenu()
+        auto.press('up', presses=2)
+        auto.press('enter')
         auto.press('down', presses=2)
         auto.press('enter')
 

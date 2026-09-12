@@ -36,6 +36,7 @@ class Search(ABC):
 
     def _searchLoop(self):
         self.__writeRandSentence()
+        tm.sleep(0.1)
         auto.press("enter")
         self.__cooldown()
         auto.press("a")             # Could be any key
@@ -48,10 +49,15 @@ class Search(ABC):
         auto.keyUp('home')
         auto.keyUp('shift')
 
-    def __searchSetup(self):
+    def _searchSetup(self):
         """Faz as preparações necessárias para iniciar a pesquisa. Depende de qual navegador está sendo usado."""
-        Script.openApp(self.browser, 0.3)
+        Script.openApp(self.browser, 1.5)
         auto.hotkey("win" + "up") # Maximiza a janela do navegador, depois de abrí-lo
+
+    @abstractmethod
+    def showBrowsers(self):
+        """Mostra os navegadores disponíveis para o script."""
+        pass
 
     @abstractmethod
     def scrapCurrentPts(self) -> int:
@@ -70,12 +76,12 @@ class Search(ABC):
             except Exception as erro:
                 print(f"Erro: {erro}. Não foi possível determinar valor inicial: valor considerado será 0. ")  
 
-        if current_pts < 0 or current_pts == None:
+        if current_pts == None or current_pts < 0:
             raise ValueError("Quantidade de pontos atual/inicial inválida.")
 
         if current_pts < self._mp:
             try:
-                self.__searchSetup()
+                self._searchSetup()
             except UndefinedBrowserError as e:
                 print(f"Erro ao abrir o navegador {self.browser}: {e}")
 
@@ -87,6 +93,8 @@ class Search(ABC):
         print(f"Quantidade limite de pontos alcançada: {self._mp} pontos.")
         return
 
+# CLASSES ESPECÍFICAS PÚBLICAS PARA CADA NAVEGADOR
+
 class DefaultSearch(Search):
     """Roda o script usando outros navegadores padrões, como Firefox, Opera GX, Chrome, etc
     
@@ -97,12 +105,34 @@ class DefaultSearch(Search):
         super().__init__(limit)
         self.__browsers_dict = {1:"Firefox"}
 
+    # Override
     def showBrowsers(self):
-        for num, name in self.__browsers_dict:
+        print("\nLista de navegadores disponíveis:\nID            Nome\n")
+        for num, name in self.__browsers_dict.items():
             print(f"{num}             {name}")
+        print()
 
     def setBrowser(self, id:int):
+        if id not in self.__browsers_dict:
+            print(f"Navegador com ID {id} não definido.")
+            return
+        
         self.browser = self.__browsers_dict[id]
+        print("Navegador selecionado: " + self.browser)
+
+    def selectedBrowser(self):
+        print(f"Navegador selecionado: {self.browser}")
+
+    # Override
+    def _searchSetup(self):
+        super()._searchSetup()
+        auto.write("bing.com")
+        auto.press("enter")
+        tm.sleep(1)
+
+    # Override
+    def scrapCurrentPts(self) -> int:
+        pass
     
 class EdgeSearch(Search):
     """Necessário usar Windows. Instancia o script para rodar especificamente no navegador Microsoft Store, que é o mais próprio
@@ -113,6 +143,10 @@ class EdgeSearch(Search):
     def __init__(self, limit:int = 60):
         super().__init__(limit)
         self.browser = "Microsoft Edge"
+
+    # Override
+    def showBrowsers(self):
+        print("Classe EdgeSearch permite apenas o navegador Microsoft Edge.")
 
     # Override
     def scrapCurrentPts(self) -> int:

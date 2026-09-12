@@ -1,3 +1,7 @@
-from bing_bot import EdgeSearch
+from bing_bot import DefaultSearch
 
-EdgeSearch().start(0)
+ds = DefaultSearch()
+
+ds.showBrowsers()
+ds.setBrowser(1)
+# ds.start(0)

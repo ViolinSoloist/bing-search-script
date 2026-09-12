@@ -1,6 +1,6 @@
 import pyautogui as auto
 import time
-from exceptions import WinFocusError
+from exceptions import WinFocusError, UndefinedBrowserError
 
 class PowerConfig:
     """Configurações de suspensão, desligamento automático, etc"""
@@ -20,6 +20,8 @@ class Script:
     def openApp(nome:str, wait:float):
         """:param nome: do aplicativo a ser aberto.
         :param wait: Margem de segurança para esperar o aplicativo abrir."""
+        if (nome == None):
+            raise UndefinedBrowserError("Classe mãe usada ou navegador não foi definido.")
 
         auto.press("win")
         time.sleep(0.2)

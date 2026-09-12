@@ -21,3 +21,6 @@ class WinFocusError(Exception):
 
 class ScrapError(Exception):
     """Quando não se obtém o valor esperado ao fazer Web Scrapping."""
+
+class UndefinedBrowserError(Exception):
+    """Quando o navegador não é definido ou não é suportado pelo script."""
